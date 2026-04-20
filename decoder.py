@@ -2,8 +2,8 @@
 import re
 import struct
 
-COPYBOOK_PATH = r"/Users/barrettjflowers/Dev/EBCDIC-decode/Copy Books (Verified)/mock.copybook"
-EBCDIC_FILE_PATH = r"/Users/barrettjflowers/Dev/EBCDIC-decode/test_data.ebcdc"
+COPYBOOK_PATH = r"C:\Users\barrett.flowers\Desktop\temp\Project Anaconda\EBCDC\Current\TD0242.copybook"
+EBCDIC_FILE_PATH = r"C:\Users\barrett.flowers\Desktop\temp\Project Anaconda\EBCDC\Current\TD0242.EBCDIC"
 
 ENCODINGS = ["cp037", "cp1047", "cp1140"]
 encoding_index = 0
