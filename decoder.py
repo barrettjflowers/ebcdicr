@@ -97,12 +97,13 @@ def decode_display(data, encoding):
 
 def render(fields, data, encoding):
     offset = 0
-    print(f"{'OFFSET':<6} {'FIELD NAME':<20} {'VALUE'}")
-    print("-" * 50)
+    print(f"{'OFFSET':6} | {'FIELD NAME':20} | VALUE      | HEX    ")
+    print("-" * 60)
     for field in fields:
         if offset + field["bytes"] > len(data):
             break
         raw = data[offset:offset + field["bytes"]]
+        hex_val = "0x" + raw.hex()
         ftype = field["type"]
         if ftype == "P":
             value = decode_comp3(raw)
@@ -118,7 +119,7 @@ def render(fields, data, encoding):
             value = decode_display(raw, encoding)
         else:
             value = decode_display(raw, encoding)
-        print(f"{offset:04X}   {field['name']:<20} {value}")
+        print(f"{offset:04X} | {field['name']:20} | {value:>12} | {hex_val}")
         offset += field["bytes"]
 
 def main():
