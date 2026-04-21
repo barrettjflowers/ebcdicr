@@ -2,11 +2,11 @@
 import re
 import struct
 
-#COPYBOOK_PATH = r"C:\Users\barrett.flowers\Desktop\temp\Project Anaconda\EBCDC\Current\TD0242.copybook"
-#EBCDIC_FILE_PATH = r"C:\Users\barrett.flowers\Desktop\temp\Project Anaconda\EBCDC\Current\TD0242.EBCDIC"
+COPYBOOK_PATH = r"C:\Users\barrett.flowers\Desktop\temp\Project Anaconda\EBCDC\Current\TD0242.copybook"
+EBCDIC_FILE_PATH = r"C:\Users\barrett.flowers\Desktop\temp\Project Anaconda\EBCDC\Current\TD0242.EBCDIC"
 
-COPYBOOK_PATH = r"/Users/barrettjflowers/Dev/EBCDIC-decode/Copy Books (Verified)/TA2244.copybook"
-EBCDIC_FILE_PATH = r"/Users/barrettjflowers/Dev/EBCDIC-decode/ebcdicr/test_ta2244.ebcdc"
+#COPYBOOK_PATH = r"/Users/barrettjflowers/Dev/EBCDIC-decode/Copy Books (Verified)/TA2244.copybook"
+#EBCDIC_FILE_PATH = r"/Users/barrettjflowers/Dev/EBCDIC-decode/ebcdicr/test_ta2244.ebcdc"
 
 ENCODINGS = ["cp037", "cp1047", "cp1140"]
 encoding_index = 0
