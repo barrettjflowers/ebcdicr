@@ -39,6 +39,7 @@ def parse_field(name, pic):
     field_type = "X"
     digits = 0
     scale = 0
+    is_comp = "COMP" in pic
     is_comp3 = "COMP-3" in pic
     
     if "X(" in pic:
@@ -49,7 +50,7 @@ def parse_field(name, pic):
     elif "V" in pic:
         v_pos = pic.find("V")
         before_v = pic[:v_pos]
-        if is_comp3:
+        if is_comp:
             field_type = "P"
         m = re.search(r"9\((\d+)\)", before_v)
         digits = int(m.group(1)) if m else 0
@@ -60,7 +61,7 @@ def parse_field(name, pic):
         else:
             scale = len(re.findall(r"9(?!\()", after_v))
     elif "9(" in pic:
-        if is_comp3:
+        if is_comp:
             field_type = "P"
         else:
             field_type = "N"
