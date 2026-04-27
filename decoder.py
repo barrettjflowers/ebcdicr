@@ -130,30 +130,15 @@ def render(fields, data, encoding, record_num=0):
 def get_record_size(fields):
     return sum(f["bytes"] for f in fields)
 
-def kbhit():
-    """Check if a key has been pressed (non-blocking on Windows)"""
-    if sys.platform == 'win32':
-        import msvcrt
-        return msvcrt.kbhit()
-    else:
-        import select
-        return select.select([sys.stdin], [], [], 0) != ([], [], [])
-
-def getch():
-    """Get a single keypress (Windows)"""
-    if sys.platform == 'win32':
-        import msvcrt
-        return msvcrt.getch()
-    else:
-        return sys.stdin.read(1)
-
 def main():
     global encoding_index
     
     print("EBCDIC Decoder - Interactive Mode")
     print("=" * 60)
     print("Controls:")
-    print("  ENTER = next record")
+    print("  n     = next record")
+    print("  p     = previous record")
+    print("  g     = go to specific record")
     print("  r     = reload copybook")
     print("  e     = cycle encoding")
     print("  q     = quit")
@@ -164,47 +149,78 @@ def main():
     
     fields = parse_copybook(COPYBOOK_PATH)
     record_size = get_record_size(fields)
-    encoding = get_current_encoding()
+    total_records = len(data) // record_size
     
-    print(f"\nEncoding: {encoding}")
+    print(f"\nEncoding: {get_current_encoding()}")
     print(f"Fields: {len(fields)}")
     print(f"Record size: {record_size} bytes")
     print(f"Total file size: {len(data)} bytes")
-    print(f"Total records: {len(data) // record_size}")
+    print(f"Total records: {total_records}")
     
     record_num = 0
     start_offset = 0
     
-    encoding = get_current_encoding()
-    render(fields, data[start_offset:start_offset + record_size], encoding, record_num)
+    render(fields, data[start_offset:start_offset + record_size], get_current_encoding(), record_num)
     
     while True:
         try:
+            print("\n[n]ext, [p]rev, [g]o to #, [r]eload, [e]nc, [q]uit: ", end="", flush=True)
+            
             if sys.platform == 'win32':
-                print("\n[ENTER]ext, [r]eload, [e]ncoding, [q]uit: ", end="", flush=True)
                 import msvcrt
                 key = msvcrt.getch()
                 key = key.decode('utf-8', errors='replace') if isinstance(key, bytes) else key
             else:
-                print("\n[ENTER]ext, [r]eload, [e]ncoding, [q]uit: ", end="", flush=True)
                 key = sys.stdin.read(1)
             
-            if key == '\r' or key == '\n':
+            if key == 'n':
                 # Next record
                 record_num += 1
-                start_offset += record_size
-                if start_offset + record_size > len(data):
-                    start_offset = 0
+                if record_num >= total_records:
                     record_num = 0
+                start_offset = record_num * record_size
                 render(fields, data[start_offset:start_offset + record_size], get_current_encoding(), record_num)
+            
+            elif key == 'p':
+                # Previous record
+                record_num -= 1
+                if record_num < 0:
+                    record_num = total_records - 1
+                start_offset = record_num * record_size
+                render(fields, data[start_offset:start_offset + record_size], get_current_encoding(), record_num)
+            
+            elif key == 'g':
+                # Go to specific record
+                try:
+                    print("\nEnter record number (0-{}): ".format(total_records - 1), end="", flush=True)
+                    if sys.platform == 'win32':
+                        import msvcrt
+                        num = ''
+                        while True:
+                            ch = msvcrt.getch()
+                            if ch == b'\r':
+                                break
+                            num += ch.decode('utf-8')
+                    else:
+                        num = input()
+                    target = int(num)
+                    if 0 <= target < total_records:
+                        record_num = target
+                        start_offset = record_num * record_size
+                        render(fields, data[start_offset:start_offset + record_size], get_current_encoding(), record_num)
+                    else:
+                        print(f"\nInvalid record number. Must be 0-{total_records - 1}")
+                except ValueError:
+                    print("\nInvalid number")
             
             elif key == 'r':
                 # Reload copybook
                 fields = parse_copybook(COPYBOOK_PATH)
                 record_size = get_record_size(fields)
-                print(f"\nReloaded copybook: {len(fields)} fields, {record_size} bytes")
-                start_offset = 0
+                total_records = len(data) // record_size
+                print(f"\nReloaded: {len(fields)} fields, {record_size} bytes, {total_records} records")
                 record_num = 0
+                start_offset = 0
                 render(fields, data[start_offset:start_offset + record_size], get_current_encoding(), record_num)
             
             elif key == 'e':
